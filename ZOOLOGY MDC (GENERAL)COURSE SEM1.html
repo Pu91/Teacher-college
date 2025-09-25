@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Portal</title>
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 10px; }
+    h2 { text-align: center; }
+    form, .chapter-card { 
+      background: #f9f9f9; padding: 12px; margin: 10px 0; 
+      border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    input, textarea { width: 100%; margin: 6px 0; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+    button { padding: 10px; border: none; background: teal; color: #fff; border-radius: 5px; margin-top: 5px; width: 48%; }
+    .actions { display: flex; justify-content: space-between; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <h2>ZOOLOGY SEM1 GENERAL COURSE</h2>
+    <a href="/school managment system data/totalstudentzoologysem1.html">total student</a>
+
+  <!-- Add Chapter Form -->
+  <form id="chapterForm">
+    <input type="text" id="chapter_title" placeholder="Chapter Title" required>
+    <input type="number" id="chapter_number" placeholder="Chapter Number" required>
+    <input type="url" id="notes_link" placeholder="Notes Link (Optional)">
+    <input type="url" id="video_link" placeholder="Video Link (Optional)">
+    <input type="url" id="meet_link" placeholder="Google Meet Link (Optional)">
+    <input type="url" id="photo_url" placeholder="Photo URL (Optional)">
+    <button type="submit">Add Chapter</button>
+  </form>
+
+  <div id="chapterList"></div>
+
+  <script>
+    const supabaseUrl = "https://krkzmfmvouvznzibakmj.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtya3ptZm12b3V2em56aWJha21qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwODgzNjYsImV4cCI6MjA3MzY2NDM2Nn0.dp73hy1rh7ulLm0m90_KgweZ1I-PRAizQsV_S8O-vec";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let teacher_id = "11111111-1111-1111-1111-111111111111"; // replace with auth user id
+
+    let editingId = null; // Track which chapter is being edited
+
+    async function fetchChapters() {
+      const { data, error } = await supabase
+        .from("chapters")
+        .select("*")
+        .eq("teacher_id", teacher_id)
+        .order("chapter_number", { ascending: true });
+
+      const list = document.getElementById("chapterList");
+      list.innerHTML = "";
+
+      if (error) {
+        list.innerHTML = `<p style="color:red">${error.message}</p>`;
+        return;
+      }
+
+      data.forEach(ch => {
+        const div = document.createElement("div");
+        div.className = "chapter-card";
+        div.innerHTML = `
+          <h3>${ch.chapter_number}. ${ch.chapter_title}</h3>
+          ${ch.notes_link ? `<p>📄 <a href="${ch.notes_link}" target="_blank">View Notes</a></p>` : ""}
+          ${ch.video_link ? `<p>🎥 <a href="${ch.video_link}" target="_blank">Video</a></p>` : ""}
+          ${ch.meet_link ? `<p>📅 <a href="${ch.meet_link}" target="_blank">Meet Link</a></p>` : ""}
+          ${ch.photo_url ? `<img src="${ch.photo_url}" width="100%">` : ""}
+          <div class="actions">
+            <button onclick="startEdit(${ch.id}, '${ch.chapter_title}', ${ch.chapter_number}, '${ch.notes_link || ""}', '${ch.video_link || ""}', '${ch.meet_link || ""}', '${ch.photo_url || ""}')">✏️ Edit</button>
+            <button onclick="deleteChapter(${ch.id})">🗑️ Delete</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    // Start editing a chapter
+    function startEdit(id, title, number, notes, video, meet, photo) {
+      editingId = id;
+      document.getElementById("chapter_title").value = title;
+      document.getElementById("chapter_number").value = number;
+      document.getElementById("notes_link").value = notes;
+      document.getElementById("video_link").value = video;
+      document.getElementById("meet_link").value = meet;
+      document.getElementById("photo_url").value = photo;
+      document.querySelector("#chapterForm button").textContent = "Update Chapter";
+    }
+
+    // Add or Update Chapter
+    document.getElementById("chapterForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const chapterData = {
+        teacher_id,
+        chapter_title: document.getElementById("chapter_title").value,
+        chapter_number: parseInt(document.getElementById("chapter_number").value),
+        notes_link: document.getElementById("notes_link").value,
+        video_link: document.getElementById("video_link").value,
+        meet_link: document.getElementById("meet_link").value,
+        photo_url: document.getElementById("photo_url").value
+      };
+
+      if (editingId) {
+        // Update chapter
+        const { error } = await supabase.from("chapters").update(chapterData).eq("id", editingId);
+        if (error) alert("Update Error: " + error.message);
+        editingId = null;
+        document.querySelector("#chapterForm button").textContent = "Add Chapter";
+      } else {
+        // Add new chapter
+        const { error } = await supabase.from("chapters").insert([chapterData]);
+        if (error) alert("Insert Error: " + error.message);
+      }
+
+      e.target.reset();
+      fetchChapters();
+    });
+
+    // Delete Chapter
+    async function deleteChapter(id) {
+      if (confirm("Are you sure you want to delete this chapter?")) {
+        const { error } = await supabase.from("chapters").delete().eq("id", id);
+        if (error) alert("Delete Error: " + error.message);
+        fetchChapters();
+      }
+    }
+    async function checkAuth() {
+      const { data, error } = await supabase.auth.getSession();
+      if (!data.session) {
+        // ❌ যদি login না থাকে → redirect
+        window.location.href = "/school managment system data/techaers.html";
+      } else {
+        console.log("✅ Logged in as:", data.session.user.email);
+        // এখানে তোমার আগের Teacher Portal code লোড করবে
+        document.getElementById("chapterSection").innerHTML = `<p>Welcome, ${data.session.user.email}</p>`;
+      }
+    }
+
+    async function logout() {
+      await supabase.auth.signOut();
+      window.location.href = "loh";
+    }
+
+    checkAuth();
+    fetchChapters();
+    
+
+  </script>
+</body>
+</html>
