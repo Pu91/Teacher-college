@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Login</title>
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; height: 100vh; justify-content: center; align-items: center; background: #f5f5f5; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 300px; }
+    input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
+    button { width: 100%; padding: 10px; background: teal; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: darkslategray; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Teacher Login</h2>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <button onclick="register()">Register</button>
+    <p id="msg" style="color:red;"></p>
+  </div>
+
+  <script>
+    const supabaseUrl = "https://krkzmfmvouvznzibakmj.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtya3ptZm12b3V2em56aWJha21qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwODgzNjYsImV4cCI6MjA3MzY2NDM2Nn0.dp73hy1rh7ulLm0m90_KgweZ1I-PRAizQsV_S8O-vec";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function login() {
+      let { user, error } = await supabase.auth.signInWithPassword({
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+      });
+      if (error) document.getElementById("msg").innerText = error.message;
+      else window.location.href = "/school managment system data/techerportal.html";
+    }
+
+    async function register() {
+      let { user, error } = await supabase.auth.signUp({
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+      });
+      if (error) document.getElementById("msg").innerText = error.message;
+      else document.getElementById("msg").innerText = "Registration successful! Now login.";
+    }
+    
+    checkAuth();
+    fetchChapters();
+  </script>
+</body>
+</html>
+
+
