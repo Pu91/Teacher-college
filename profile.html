@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f8f9fa;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #4CAF50, #2e7d32);
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      position: relative;
+    }
+
+    .header img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .header h1 {
+      margin: 10px 0 5px;
+      font-size: 24px;
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    /* Info */
+    .info {
+      background: #fff;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+
+    .info h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #333;
+      border-bottom: 2px solid #4CAF50;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+
+    .info p {
+      margin: 10px 0;
+      font-size: 15px;
+      color: #444;
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info p span {
+      font-weight: bold;
+      color: #222;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 8px 16px;
+      background: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+      border: none;
+    }
+
+    .btn:hover {
+      background: #388e3c;
+    }
+
+    .btn.cancel {
+      background: #f44336;
+      margin-left: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 6px 10px;
+      font-size: 14px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 20px;
+      }
+      .info {
+        margin: 10px;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <img id="teacherPhoto" src="https://i.ibb.co/Y7sxCtF4/IMG-20250928-WA0012.jpg" alt="Teacher Photo">
+    <h1 id="teacherName">sourav sahoo</h1>
+    <p id="teacherSubject">ZOOLOGY teacher cu college all subject notes company</p>
+  </div>
+
+  <!-- Info Section -->
+  <div class="info">
+    <h2>Profile Information</h2>
+    <p><span>Name:</span> <span id="infoName">sourav sahoo</span></p>
+    <p><span>Email:</span> <span id="infoEmail">sszms99@gmail.com</span></p>
+    <p><span>Phone:</span> <span id="infoPhone">9123060228</span></p>
+    <p><span>Address:</span> <span id="infoAddress">P.O dngalsa P.S pingla paschim medinipur PIN 721131</span></p>
+    <p><span>Qualification:</span> <span id="infoQualification">B.SC M.SC P.HD</span></p>
+    <p><span>Experience:</span> <span id="infoExperience">5 year</span></p>
+
+    <button class="btn" id="editBtn">Edit Profile</button>
+  </div>
+
+  <script>
+    const teacher = {
+      name: "Mrs. sourav sahoo",
+      subject: "ZOOLOGY teacher cu college all subject notes company<",
+      qualification: "B.SC M.SC P.HD",
+      email: "ssmzs99@gmail.com",
+      phone: "9123060228",
+      address: "P.O gangalsa P.S pingla paschim medinipur PIN 721131",
+      experience: "5 year",
+      photo: "https://i.ibb.co/Y7sxCtF4/IMG-20250928-WA0012.jpg"
+    };
+
+    // Load data
+    function loadProfile() {
+      document.getElementById("teacherName").innerText = teacher.name;
+      document.getElementById("teacherSubject").innerText = teacher.subject;
+      document.getElementById("teacherPhoto").src = teacher.photo;
+
+      document.getElementById("infoName").innerText = teacher.name;
+      document.getElementById("infoEmail").innerText = teacher.email;
+      document.getElementById("infoPhone").innerText = teacher.phone;
+      document.getElementById("infoAddress").innerText = teacher.address;
+      document.getElementById("infoQualification").innerText = teacher.qualification;
+      document.getElementById("infoExperience").innerText = teacher.experience;
+    }
+
+    loadProfile();
+
+    const editBtn = document.getElementById("editBtn");
+    let editing = false;
+
+    editBtn.addEventListener("click", () => {
+      if (!editing) {
+        // Turn fields into input boxes
+        document.getElementById("infoName").innerHTML = `<input type="text" id="editName" value="${teacher.name}">`;
+        document.getElementById("infoEmail").innerHTML = `<input type="email" id="editEmail" value="${teacher.email}">`;
+        document.getElementById("infoPhone").innerHTML = `<input type="text" id="editPhone" value="${teacher.phone}">`;
+        document.getElementById("infoAddress").innerHTML = `<input type="text" id="editAddress" value="${teacher.address}">`;
+        document.getElementById("infoQualification").innerHTML = `<input type="text" id="editQualification" value="${teacher.qualification}">`;
+        document.getElementById("infoExperience").innerHTML = `<input type="text" id="editExperience" value="${teacher.experience}">`;
+
+        editBtn.innerText = "Save";
+        editing = true;
+      } else {
+        // Save data
+        teacher.name = document.getElementById("editName").value;
+        teacher.email = document.getElementById("editEmail").value;
+        teacher.phone = document.getElementById("editPhone").value;
+        teacher.address = document.getElementById("editAddress").value;
+        teacher.qualification = document.getElementById("editQualification").value;
+        teacher.experience = document.getElementById("editExperience").value;
+
+        loadProfile();
+        editBtn.innerText = "Edit Profile";
+        editing = false;
+      }
+    });
+  </script>
+
+</body>
+</html>
